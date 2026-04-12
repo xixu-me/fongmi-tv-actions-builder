@@ -213,7 +213,7 @@ jobs:
 
       - name: Create GitHub Release
         if: steps.check_build.outputs.build_needed == 'true' && steps.build_apks.outcome == 'success'
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.commit_info.outputs.short_hash }}
           name: "FongMi TV APK Release ${{ steps.commit_info.outputs.short_hash }}"
