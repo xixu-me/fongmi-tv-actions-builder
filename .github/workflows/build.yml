@@ -176,6 +176,27 @@ jobs:
           fi
           echo "✅ Keystore decoded successfully"
 
+      - name: Prepare Android local.properties
+        if: steps.check_build.outputs.build_needed == 'true'
+        run: |
+          echo "📝 Preparing Android local.properties for CI..."
+
+          SDK_DIR="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
+          if [ -z "$SDK_DIR" ]; then
+            echo "❌ ANDROID_HOME / ANDROID_SDK_ROOT is not set"
+            exit 1
+          fi
+
+          cat > src/local.properties <<EOF
+          sdk.dir=$SDK_DIR
+          storeFile=$GITHUB_WORKSPACE/keystore.jks
+          storePassword=$KEYSTORE_PASSWORD
+          keyAlias=$KEY_ALIAS
+          keyPassword=$KEY_PASSWORD
+          EOF
+
+          echo "✅ local.properties created successfully"
+
       - name: Build release APKs
         id: build_apks
         if: steps.check_build.outputs.build_needed == 'true'
@@ -207,8 +228,9 @@ jobs:
       - name: Clean up keystore
         if: steps.check_build.outputs.build_needed == 'true'
         run: |
-          # Clean up keystore for security
+          # Clean up generated signing files for security
           rm -f "$GITHUB_WORKSPACE/keystore.jks"
+          rm -f "$GITHUB_WORKSPACE/src/local.properties"
           echo "🔐 Keystore cleaned up"
 
       - name: Create GitHub Release
