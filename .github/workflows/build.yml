@@ -149,6 +149,12 @@ jobs:
           java-version: "17"
           cache: "gradle"
 
+      - name: Set up Python 3.10
+        if: steps.check_build.outputs.build_needed == 'true'
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.10"
+
       - name: Cache Gradle dependencies
         if: steps.check_build.outputs.build_needed == 'true'
         uses: actions/cache@v5
